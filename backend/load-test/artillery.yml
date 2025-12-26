@@ -1,0 +1,55 @@
+# Artillery Load Test Configuration
+# Simulates 5000 concurrent POST /api/scrape requests
+# Target: Queue jobs quickly (<500ms response time) on 1 CPU / 1GB RAM
+
+config:
+  target: "http://localhost:3001"
+  processor: "./helpers.js"
+  phases:
+    # Warm-up phase: 10 users/sec for 10 seconds (100 total)
+    - duration: 10
+      arrivalRate: 10
+      name: "Warm-up"
+    
+    # Ramp-up phase: Increase from 10 to 100 users/sec over 30 seconds (~1650 total)
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 100
+      name: "Ramp-up"
+    
+    # Sustained load: 100 users/sec for 33 seconds (~3300 total)
+    # Total: ~5050 requests
+    - duration: 33
+      arrivalRate: 100
+      name: "Sustained Load"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      # Basic Auth: admin:admin123 (base64 encoded)
+      Authorization: "Basic YWRtaW46YWRtaW4xMjM="
+
+  # Plugins for better reporting
+  plugins:
+    expect: {}
+
+  # Ensure we complete all requests
+  ensure:
+    p95: 1000        # 95th percentile < 1 second
+    maxErrorRate: 5  # Max 5% error rate
+
+scenarios:
+  - name: "Submit Scraping Job"
+    flow:
+      - function: "generateUrls"
+      - post:
+          url: "/api/scrape"
+          json:
+            urls: "{{ urls }}"
+          capture:
+            - json: "$.data.job_id"
+              as: "jobId"
+          expect:
+            - statusCode: 201
+            - hasProperty: "data.job_id"
+

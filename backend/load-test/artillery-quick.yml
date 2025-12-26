@@ -1,0 +1,41 @@
+# Artillery Quick Test Configuration
+# Quick smoke test: 100 requests over 10 seconds
+# Use this for rapid testing during development
+
+config:
+  target: "http://localhost:3001"
+  processor: "./helpers.js"
+  phases:
+    # Quick test: 10 users/sec for 10 seconds (100 total)
+    - duration: 10
+      arrivalRate: 10
+      name: "Quick Test"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      # Basic Auth: admin:admin123 (base64 encoded)
+      Authorization: "Basic YWRtaW46YWRtaW4xMjM="
+
+  plugins:
+    expect: {}
+
+  ensure:
+    p95: 500         # 95th percentile < 500ms
+    maxErrorRate: 1  # Max 1% error rate
+
+scenarios:
+  - name: "Quick Test - Submit Scraping Job"
+    flow:
+      - function: "generateUrls"
+      - post:
+          url: "/api/scrape"
+          json:
+            urls: "{{ urls }}"
+          capture:
+            - json: "$.data.job_id"
+              as: "jobId"
+          expect:
+            - statusCode: 201
+            - hasProperty: "data.job_id"
+
