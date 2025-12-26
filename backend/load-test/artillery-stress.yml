@@ -1,0 +1,42 @@
+# Artillery Stress Test Configuration
+# Maximum stress test: 5000 requests as fast as possible
+# Use this to find the breaking point of the system
+
+config:
+  target: "http://localhost:3001"
+  processor: "./helpers.js"
+  phases:
+    # Burst: Send 5000 requests over 10 seconds (500 req/sec)
+    - duration: 10
+      arrivalRate: 500
+      name: "Burst Load - 5000 requests"
+
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      # Basic Auth: admin:admin123 (base64 encoded)
+      Authorization: "Basic YWRtaW46YWRtaW4xMjM="
+
+  # Plugins
+  plugins:
+    expect: {}
+
+  # Performance thresholds for stress test
+  ensure:
+    p99: 5000        # 99th percentile < 5 seconds (stress test is more lenient)
+    maxErrorRate: 10 # Max 10% error rate under stress
+
+scenarios:
+  - name: "Stress Test - Submit Scraping Job"
+    flow:
+      - function: "generateUrls"
+      - post:
+          url: "/api/scrape"
+          json:
+            urls: "{{ urls }}"
+          capture:
+            - json: "$.data.job_id"
+              as: "jobId"
+          expect:
+            - statusCode: 201
+

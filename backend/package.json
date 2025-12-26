@@ -1,0 +1,81 @@
+{
+  "name": "media-scraper-backend",
+  "version": "1.0.0",
+  "description": "Media Scraper API - Backend service for scraping images and videos from websites",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "db:reset": "prisma migrate reset --force",
+    "create-user": "ts-node scripts/create-user.ts",
+    "load-test": "artillery run --config load-test/artillery.yml load-test/artillery.yml",
+    "load-test:quick": "artillery run --config load-test/artillery-quick.yml load-test/artillery-quick.yml",
+    "load-test:stress": "artillery run --config load-test/artillery-stress.yml load-test/artillery-stress.yml",
+    "load-test:report": "artillery run --config load-test/artillery.yml load-test/artillery.yml --output load-test/results.json && artillery report load-test/results.json --output load-test/report.html"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "keywords": [
+    "media",
+    "scraper",
+    "api",
+    "express",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.7.1",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.12.0",
+    "cheerio": "^1.0.0-rc.12",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.11.3",
+    "prisma": "^5.7.1",
+    "puppeteer": "^24.0.0",
+    "redis": "^4.6.11",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.10.5",
+    "@types/pg": "^8.10.9",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  },
+  "optionalDependencies": {
+    "@types/jest": "^29.5.11",
+    "artillery": "^2.0.27",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.1",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.1.1",
+    "typescript-eslint": "^8.0.0"
+  }
+}
